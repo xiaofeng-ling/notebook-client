@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:notebook"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="日记本" Height="800" Width="752" WindowStartupLocation="Manual">
     <Grid>
-        
+        <ListBox HorizontalAlignment="Left" Height="417" VerticalAlignment="Top" Width="139" Margin="587,200,0,0">
+        </ListBox>
+        <TextBox HorizontalAlignment="Left" Height="497" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="524" Margin="26,120,0,0"/>
+        <TextBlock HorizontalAlignment="Left" Margin="26,22,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="53" Width="524"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="587,120,0,0" VerticalAlignment="Top" Width="139" Height="35" />
+        <Button Content="Button" HorizontalAlignment="Left" Margin="587,160,0,0" VerticalAlignment="Top" Width="139" Height="35" />
+        <Image HorizontalAlignment="Left" Height="141" Margin="587,796,0,0" VerticalAlignment="Top" Width="139"/>
+
+
     </Grid>
 </Window>
