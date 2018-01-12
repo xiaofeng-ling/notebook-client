@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,18 @@ namespace notebook
         public MainWindow()
         {
             InitializeComponent();
+
+            this.mybutton.Click += this.mybutton_Click;
+
+            this.maskLayer.MouseLeftButtonUp += (object sender, MouseButtonEventArgs e) => {
+                // 隐藏遮罩层
+                this.maskLayer.Visibility = Visibility.Hidden;
+            };
+        }
+
+        private void mybutton_Click(object sender, RoutedEventArgs e)
+        {
+            this.maskLayer.Visibility = Visibility.Visible;
         }
     }
 }
