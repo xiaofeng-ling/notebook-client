@@ -22,6 +22,8 @@ namespace notebook
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Array arr;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -30,13 +32,23 @@ namespace notebook
 
             this.maskLayer.MouseLeftButtonUp += (object sender, MouseButtonEventArgs e) => {
                 // 隐藏遮罩层
-                this.maskLayer.Visibility = Visibility.Hidden;
+                //this.maskLayer.Visibility = Visibility.Hidden;
+                GlobalVar.sess = "123";
+                var loginWindow = new Login();
+                loginWindow.ShowDialog();
             };
         }
 
-        private void mybutton_Click(object sender, RoutedEventArgs e)
+        public void mybutton_Click(object sender, RoutedEventArgs e)
         {
             this.maskLayer.Visibility = Visibility.Visible;
         }
+    }
+
+    // 全局变量类
+    public class GlobalVar
+    {
+        // 登录过后的sess
+        public static string sess = "";
     }
 }

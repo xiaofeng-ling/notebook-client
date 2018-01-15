@@ -5,15 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:notebook"
         mc:Ignorable="d"
-        Title="日记本" Height="600" Width="800" WindowStartupLocation="Manual" MinWidth="800" MinHeight="600" HorizontalAlignment="Left" VerticalAlignment="Top"
+        Title="日记本" WindowStartupLocation="Manual" MinWidth="800" MinHeight="600" HorizontalAlignment="Left" VerticalAlignment="Top"
         x:Name="win" >
 
     <Grid>
         <Grid x:Name="maskLayer" Background="green" HorizontalAlignment="Left" Panel.ZIndex="1" Height="{Binding ElementName=win,Path=Height}" Width="{Binding ElementName=win,Path=Width}" VerticalAlignment="Top"/>
-        
-        <TextBox Height="381" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,120,342,0" BorderBrush="#FFDAD7D7" Background="{x:Null}" />
+
+        <TextBox Height="381" TextWrapping="Wrap" VerticalAlignment="Top" Margin="26,120,204,0" BorderBrush="#FFDAD7D7" Background="{x:Null}" />
         <TextBlock x:Name="textblock" HorizontalAlignment="Left" Margin="26,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="53" Width="524"/>
-        <Button x:Name="mybutton" Content="Button" HorizontalAlignment="Left" Margin="475,120,0,0" VerticalAlignment="Top" Width="45" Height="45"></Button>
+        <Button x:Name="mybutton" Content="Button" HorizontalAlignment="Left" Margin="615,120,0,0" VerticalAlignment="Top" Width="45" Height="45"></Button>
+        <Button x:Name="mybutton_Copy" Content="Button" HorizontalAlignment="Left" Margin="682,120,0,0" VerticalAlignment="Top" Width="45" Height="45"/>
+        <ListBox x:Name="listbox" HorizontalAlignment="Left" Height="312" Margin="615,189,0,0" VerticalAlignment="Top" Width="112" Background="blue"/>
     </Grid>
 
     <Window.Resources>
