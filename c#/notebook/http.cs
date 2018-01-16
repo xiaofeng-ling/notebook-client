@@ -17,20 +17,30 @@ namespace notebook
         // http请求对象
         private HttpWebRequest httpObj = null;
         private HttpWebResponse httpResponse = null;
+        private byte[] httpResult = new byte[0];
+
+        public HttpWebResponse HttpResponse { get { return httpResponse; } }
 
         public Http(string url, string method)
         {
-            httpObj = WebRequest.Create(url) as HttpWebRequest;
+            List<string> methods = new List<string> { "POST", "GET" };
+
+            if (!methods.Exists(value => value.Equals(method)))
+                throw new Exception("不支持的方法:" + method);
+
+
+            httpObj = WebRequest.CreateHttp(url);
             httpObj.Method = method;
         }
 
-        public HttpWebResponse Send(IDictionary<string,string> parameters = null, int timeout = 30000)
+        public Http Send(IDictionary<string,string> parameters = null, int timeout = 30000)
         {
             httpObj.ContentType = "application/x-www-form-urlencoded";
+            httpObj.Headers = new WebHeaderCollection();
 
             httpObj.Timeout = timeout;
 
-            if (httpObj.Method.Equals("POST"))
+            if (httpObj.Method.Equals("POST") && parameters != null)
             {
                 using (Stream stream = httpObj.GetRequestStream())
                 {
@@ -40,24 +50,46 @@ namespace notebook
                 }
             }
 
-            return httpResponse = httpObj.GetResponse() as HttpWebResponse;
+            httpResponse = httpObj.GetResponse() as HttpWebResponse;
+
+            return this;
         }
 
         // 从网络请求中获取数据
-        public byte[] GetResponseBytes(HttpWebResponse response = null)
+        public byte[] GetResponseBytes()
         {
-            if (response == null)
+            if (httpResponse == null)
+                throw new Exception("没有返回响应！");
+
+            Stream result = httpResponse.GetResponseStream();
+            MemoryStream memoryStream = new MemoryStream(1024);
+
+            if (httpResult.Length > 0)
+                return httpResult;
+
+            byte[] buffer = new byte[1*1024];          // 缓存区1KB
+
+            // 从网络流读取数据到内存流
+            while (true)
             {
-                response = httpResponse;
-             }
+                int count = result.Read(buffer, 0, buffer.Length);
 
-            var result = response.GetResponseStream();
+                if (count <= 0)
+                    break;
 
-            byte[] bytes = new byte[response.ContentLength];
+                memoryStream.Write(buffer, 0, count);
+            }
 
-            result.Read(bytes, 0, bytes.Length);
+            return httpResult = memoryStream.ToArray();
+        }
 
-            return bytes;
+        // 将网络请求转化为字符串
+        public string GetResponseString(string encode = "UTF-8")
+        {
+            byte[] result = GetResponseBytes();
+
+            Encoding encoding = Encoding.GetEncoding(encode);
+            return encoding.GetString(result);
         }
         
         // 创建http查询

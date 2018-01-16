@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 
 namespace notebook
 {
@@ -30,15 +31,15 @@ namespace notebook
             string username = this.username.Text;
             string password = this.password.Text;
 
-            var http = new Http("http://www.baidu.com", "GET");
+            var http = new Http("http://www.qq.com", "GET");
 
-            var result = http.Send();
-           
-            FileStream fs = new FileStream("baidu.html", FileMode.OpenOrCreate);
+            byte[] bytes = http.Send().GetResponseBytes();
 
-            byte[] bytes = http.GetResponseBytes();
+            //FileStream fs = new FileStream("baidu.html", FileMode.OpenOrCreate);
 
-            fs.Write(bytes, 0, bytes.Length);
+            //fs.Write(bytes, 0, bytes.Length);
+
+            string t = http.GetResponseString();
 
             MessageBox.Show(GlobalVar.sess);
         }
