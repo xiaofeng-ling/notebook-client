@@ -61,23 +61,25 @@ namespace notebook
             if (httpResponse == null)
                 throw new Exception("没有返回响应！");
 
-            Stream result = httpResponse.GetResponseStream();
-            MemoryStream memoryStream = new MemoryStream(1024);
+            MemoryStream memoryStream = new MemoryStream();
 
             if (httpResult.Length > 0)
                 return httpResult;
 
             byte[] buffer = new byte[1*1024];          // 缓存区1KB
 
-            // 从网络流读取数据到内存流
-            while (true)
+            using (Stream result = httpResponse.GetResponseStream())
             {
-                int count = result.Read(buffer, 0, buffer.Length);
+                // 从网络流读取数据到内存流
+                while (true)
+                {
+                    int count = result.Read(buffer, 0, buffer.Length);
 
-                if (count <= 0)
-                    break;
+                    if (count <= 0)
+                        break;
 
-                memoryStream.Write(buffer, 0, count);
+                    memoryStream.Write(buffer, 0, count);
+                }
             }
 
             return httpResult = memoryStream.ToArray();
