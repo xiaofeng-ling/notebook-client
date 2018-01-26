@@ -33,13 +33,9 @@ namespace notebook
 
             var http = new Http("http://www.qq.com", "GET");
 
-            byte[] bytes = http.Send().GetResponseBytes();
+            string result = http.Send().GetResponseString();
 
-            //FileStream fs = new FileStream("baidu.html", FileMode.OpenOrCreate);
-
-            //fs.Write(bytes, 0, bytes.Length);
-
-            string t = http.GetResponseString();
+            Json.
 
             MessageBox.Show(GlobalVar.sess);
         }
