@@ -31,13 +31,37 @@ namespace notebook
             string username = this.username.Text;
             string password = this.password.Text;
 
-            var http = new Http("http://www.qq.com", "GET");
+            var http = new Http("http://192.168.0.160/app/lease/goods/getList", "GET");
 
             string result = http.Send().GetResponseString();
 
-            Json.
+            var r = http.GetResponseJsonObject<Result>();
 
-            MessageBox.Show(GlobalVar.sess);
+            if (r == null)
+            {
+                MessageBox.Show("网络请求失败！");
+                return ;
+            }
+
+            if (r.cn != 0)
+            {
+                MessageBox.Show(r.message);
+            }
+            else
+            {
+                MessageBox.Show("您已成功登陆！");
+            }
         }
+    }
+
+    /// <summary>
+    /// 解析的
+    /// </summary>
+    public class Result
+    {
+        public string code;
+        public int cn;
+        public string message;
+        public Object data = new { code = "", cn = 0, message = "" };
     }
 }

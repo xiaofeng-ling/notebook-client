@@ -22,8 +22,6 @@ namespace notebook
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Array arr;
-
         public MainWindow()
         {
             InitializeComponent();
