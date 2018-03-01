@@ -39,9 +39,9 @@ namespace notebook
 
         public Http Send(IDictionary<string,string> parameters = null, int timeout = 30000)
         {
-            httpObj.ContentType = "application/x-www-form-urlencoded";
-            httpObj.Headers = new WebHeaderCollection();
 
+            httpObj.Headers = new WebHeaderCollection();
+            httpObj.ContentType = "application/x-www-form-urlencoded";
             httpObj.Timeout = timeout;
 
             if (httpObj.Method.Equals("POST") && parameters != null)
@@ -127,23 +127,27 @@ namespace notebook
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns>string</returns>
-        private string HttpBuildQuery(IDictionary<string, string> parameters)
+        private string HttpBuildQuery(IDictionary<string, string> parameters, bool needEncode = false)
         {
             StringBuilder buffer = new StringBuilder();
-            bool firstFlag = true;
+            string format = "{0}={1}";
 
             foreach (string key in parameters.Keys)
             {
-                if (firstFlag)
-                {
-                    buffer.AppendFormat("{0}={1}", key, parameters[key]);
-                    firstFlag = false;
-                }
+                string value;
+
+                if (needEncode)
+                    value = WebUtility.UrlEncode(parameters[key]);
                 else
-                    buffer.AppendFormat("&{0}={1}", key, parameters[key]);
+                    value = parameters[key];
+
+
+                buffer.AppendFormat(format, key, value);
+
+                format = "&{0}={1}";
             }
 
-            return WebUtility.UrlEncode(buffer.ToString());
+            return buffer.ToString();
         }
     }
 }

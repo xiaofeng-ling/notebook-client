@@ -13,6 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
+using System.Reflection;
+using System.Dynamic;
+using Newtonsoft.Json.Linq;
 
 namespace notebook
 {
@@ -26,42 +29,54 @@ namespace notebook
             InitializeComponent();
         }
 
-        private void Login_Click(object sender, RoutedEventArgs e)
+        private void Login_Click(object sender, RoutedEventArgs eventArgs)
         {
             string username = this.username.Text;
             string password = this.password.Text;
 
-            var http = new Http("http://192.168.0.160/app/lease/goods/getList", "GET");
+            var http = new Http("http://192.168.0.160/panel/lease/goods/getList", "POST");
 
-            string result = http.Send().GetResponseString();
-
-            var r = http.GetResponseJsonObject<Result>();
-
-            if (r == null)
+            IDictionary<string, string> par = new Dictionary<string, string>
             {
-                MessageBox.Show("网络请求失败！");
-                return ;
+                { "panel_sess", "f5b8tkCdCCFYrT0jxPX%2FVzgL1s%2BUhg1lvfjx3OwDBiFfROrC3EJD4DFqhZagDabw1b5ljAKLonyLekO5" }
+            };
+
+            try
+            {
+
+                dynamic result = http.Send(par).GetResponseJsonObject<dynamic>();
+
+                if (result == null)
+                {
+                    MessageBox.Show("网络请求失败！");
+                    return;
+                }
+
+                if (result.cn != 0)
+                {
+                    MessageBox.Show(result.message);
+                }
+                else
+                {
+                    MessageBox.Show(result.data.list[0].name.Value as string);
+                    MessageBox.Show("您已成功登陆！");
+                }
             }
-
-            if (r.cn != 0)
+            catch (Exception e)
             {
-                MessageBox.Show(r.message);
-            }
-            else
-            {
-                MessageBox.Show("您已成功登陆！");
+                MessageBox.Show(e.Message);
             }
         }
     }
 
     /// <summary>
-    /// 解析的
+    /// 解析的结果类
     /// </summary>
     public class Result
     {
         public string code;
         public int cn;
         public string message;
-        public Object data = new { code = "", cn = 0, message = "" };
+        public Object data = new { pageIndex = 0, pageSize = 0, total = 0, list = ""};
     }
 }

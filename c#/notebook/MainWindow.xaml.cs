@@ -31,7 +31,6 @@ namespace notebook
             this.maskLayer.MouseLeftButtonUp += (object sender, MouseButtonEventArgs e) => {
                 // 隐藏遮罩层
                 //this.maskLayer.Visibility = Visibility.Hidden;
-                GlobalVar.sess = "123";
                 var loginWindow = new Login();
                 loginWindow.ShowDialog();
             };
