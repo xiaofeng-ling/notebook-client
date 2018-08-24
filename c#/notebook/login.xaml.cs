@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using System.Reflection;
 using System.Dynamic;
 using Newtonsoft.Json.Linq;
+using notebook.request;
 
 namespace notebook
 {
@@ -34,49 +35,32 @@ namespace notebook
             string username = this.username.Text;
             string password = this.password.Text;
 
-            var http = new Http("http://192.168.0.160/panel/lease/goods/getList", "POST");
-
-            IDictionary<string, string> par = new Dictionary<string, string>
-            {
-                { "panel_sess", "f5b8tkCdCCFYrT0jxPX%2FVzgL1s%2BUhg1lvfjx3OwDBiFfROrC3EJD4DFqhZagDabw1b5ljAKLonyLekO5" }
-            };
+            // todo debug
+            username = "q849958241@163.com";
+            password = "123456";
 
             try
             {
+                IDictionary<string, string> data = new Dictionary<string, string>();
+                data.Add("email", username);
+                data.Add("password", password);
 
-                dynamic result = http.Send(par).GetResponseJsonObject<dynamic>();
+                string temp = Http.Send("http://notebook.test/api/login", "POST", data);
+                LoginResult result = JsonConvert.DeserializeObject<LoginResult>(temp);
 
-                if (result == null)
-                {
-                    MessageBox.Show("网络请求失败！");
-                    return;
-                }
-
-                if (result.cn != 0)
-                {
-                    MessageBox.Show(result.message);
-                }
-                else
-                {
-                    MessageBox.Show(result.data.list[0].name.Value as string);
-                    MessageBox.Show("您已成功登陆！");
-                }
+                if (result.code == 1000)
+                    GlobalVar.token = result.data.ToString();
+                MessageBox.Show(result.message);
+                MessageBox.Show(GlobalVar.token);
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
+            finally
+            {
+                this.Close();
+            }
         }
-    }
-
-    /// <summary>
-    /// 解析的结果类
-    /// </summary>
-    public class Result
-    {
-        public string code;
-        public int cn;
-        public string message;
-        public Object data = new { pageIndex = 0, pageSize = 0, total = 0, list = ""};
     }
 }
