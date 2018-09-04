@@ -27,8 +27,11 @@
 
             <StackPanel Orientation="Horizontal" Grid.Row="0">
                 <Button x:Name="add" Margin="15,10,20,10" Width="40" Height="40" Content="新增"/>
-                <Button x:Name="save" Width="40" Height="40" Content="保存" Margin="15,10, 10,10" />
+                <Button x:Name="save" Margin="15,10, 10,10" Width="40" Height="40" Content="保存" />
             </StackPanel>
+
+            <Button x:Name="modify" Height="20" VerticalAlignment="Bottom" Content="修改标题" Margin="15,0,78,4"/>
+            <Button x:Name="delete" Height="20" VerticalAlignment="Bottom"  Width="40" Content="删除" Margin="89,0,21,4"/>
 
             <ListView x:Name="list" Grid.Row="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,10,10,10" Width="120">
             </ListView>
@@ -39,7 +42,7 @@
         <Menu HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Grid.ColumnSpan="2" Margin="10,10,10,0">
             <MenuItem Margin="0,0,10,0" Header="开始&#xD;&#xA;开始" Height="18" Width="60">
                 <MenuItem Header="登录" Click="MenuItem_Click" HorizontalAlignment="Left">
-                    
+
                 </MenuItem>
             </MenuItem>
             <MenuItem  Margin="0,0,10,0" Header="帮助" Height="18" Width="60"/>

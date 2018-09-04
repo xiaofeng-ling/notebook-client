@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:notebook"
         mc:Ignorable="d"
-        Title="login" Height="189.182" Width="274.67">
+        Title="登录" Height="189.182" Width="274.67">
     <Grid HorizontalAlignment="Left" Height="{Binding}" VerticalAlignment="Top" Width="{Binding}">
         <TextBox x:Name="username" HorizontalAlignment="Left" Height="29" Margin="74,11,0,0" TextWrapping="Wrap" ToolTip="请输入用户名" VerticalAlignment="Top" Width="178"/>
-        <TextBox x:Name="password" HorizontalAlignment="Left" Height="29" Margin="74,63,0,0" TextWrapping="Wrap" ToolTip="请输入密码" VerticalAlignment="Top" Width="178"/>
+        <PasswordBox x:Name="password" HorizontalAlignment="Left" Height="29" Margin="74,63,0,0"  ToolTip="请输入密码" VerticalAlignment="Top" Width="178" />
         <Button Content="登录" HorizontalAlignment="Left" Margin="177,113,0,0" VerticalAlignment="Top" Width="75" Height="30" Click="Login_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,11,0,0" TextWrapping="Wrap" Text="用户名：" VerticalAlignment="Top" Height="29" Width="49"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,63,0,0" TextWrapping="Wrap" Text="密码：" VerticalAlignment="Top" Height="29" Width="49"/>

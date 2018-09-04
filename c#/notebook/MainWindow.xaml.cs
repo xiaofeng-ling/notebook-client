@@ -23,28 +23,34 @@ namespace notebook
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int temp = 1;
-
         public MainWindow()
         {
             InitializeComponent();
 
+            Config config = Config.LoadConfig();
+            GlobalVar.token = config.token;
+
+            if ("" == GlobalVar.token)
+                new Login().ShowDialog();
+
+            new NoteBookMain().ShowDialog();
+
             this.add.Click += this.AddClick;
             this.save.Click += this.SaveClickAsync;
+
+            this.text.Text = GlobalVar.token;
         }
 
         private async void SaveClickAsync(object sender, RoutedEventArgs e)
         {
-
+            new NoteBookMain().ShowDialog();
             dynamic end = this.list.Items.Count - 1;
             this.list.Items.RemoveAt(end);
-            MessageBox.Show("123");
-
         }
 
         private void AddClick(object sender, RoutedEventArgs e)
         {
-            this.list.Items.Add(this.temp++);
+            //this.list.Items.Add();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)

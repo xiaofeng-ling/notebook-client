@@ -17,9 +17,10 @@ namespace notebook
 
         class Request
         {
-            public string baseUrl = "http://notebook.test/api/";
+            public static string baseUrl = "http://notebook.test/api/";
 
-            public string login = "login";
+            public static string login = "login";
+            public static string notebookMainList = "notebookMain/getList";
         }
     }
 }

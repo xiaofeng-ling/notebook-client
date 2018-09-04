@@ -33,11 +33,7 @@ namespace notebook
         private void Login_Click(object sender, RoutedEventArgs eventArgs)
         {
             string username = this.username.Text;
-            string password = this.password.Text;
-
-            // todo debug
-            username = "q849958241@163.com";
-            password = "123456";
+            string password = this.password.Password;
 
             try
             {
@@ -48,18 +44,24 @@ namespace notebook
                 string temp = Http.Send("http://notebook.test/api/login", "POST", data);
                 LoginResult result = JsonConvert.DeserializeObject<LoginResult>(temp);
 
+                Config config = Config.LoadConfig();
+
                 if (result.code == 1000)
+                {
                     GlobalVar.token = result.data.ToString();
-                MessageBox.Show(result.message);
-                MessageBox.Show(GlobalVar.token);
+                    config.token = GlobalVar.token;
+                    config.saveConfig();
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show(result.message);
+                }
+                
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
-            }
-            finally
-            {
-                this.Close();
             }
         }
     }
