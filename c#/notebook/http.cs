@@ -49,7 +49,7 @@ namespace notebook
 
                 if ("POST" == method)
                 {
-                    byte[] data = Encoding.Default.GetBytes(tempParam);
+                    byte[] data = Encoding.UTF8.GetBytes(tempParam);
                     request.ContentLength = data.Length;
                     request.ContentType = "application/x-www-form-urlencoded";
 
@@ -87,7 +87,7 @@ namespace notebook
         {
             string responseText = "";
 
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 responseText = Send(url, method, parameters);
 

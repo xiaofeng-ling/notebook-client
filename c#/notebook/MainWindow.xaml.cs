@@ -30,7 +30,7 @@ namespace notebook
             Config config = Config.LoadConfig();
             GlobalVar.token = config.token;
 
-            if ("" == GlobalVar.token)
+            //if ("" == GlobalVar.token)
                 new Login().ShowDialog();
 
             new NoteBookMain().ShowDialog();
@@ -41,7 +41,7 @@ namespace notebook
             this.text.Text = GlobalVar.token;
         }
 
-        private async void SaveClickAsync(object sender, RoutedEventArgs e)
+        private void SaveClickAsync(object sender, RoutedEventArgs e)
         {
             new NoteBookMain().ShowDialog();
             dynamic end = this.list.Items.Count - 1;
@@ -64,5 +64,8 @@ namespace notebook
     {
         // 登录过后的token
         public static string token = "";
+
+        // 登录过后的用户id
+        public static int user_id = 0;
     }
 }

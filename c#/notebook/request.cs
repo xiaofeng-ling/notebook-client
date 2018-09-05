@@ -4,23 +4,61 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace notebook
+namespace notebook.request
 {
-    namespace request
+    class Result
     {
-        struct LoginResult
+        public int code;
+        public string message;
+        public Object data;
+    }
+
+    class LoginResult : Result
+    {
+        public new Login data;
+
+        public class Login
         {
-            public int code;
-            public string message;
-            public Object data;
+            public string token;
+            public int user_id;
         }
+    }
 
-        class Request
+    class NotebookMainList: Result
+    {
+        public new List<NotebookMain> data;
+
+        public class NotebookMain
         {
-            public static string baseUrl = "http://notebook.test/api/";
+            public int id;
+            public string name;
+            public int user_id;
 
-            public static string login = "login";
-            public static string notebookMainList = "notebookMain/getList";
+            public override string ToString()
+            {
+                return name;
+            }
+        }
+    }
+
+    class Request
+    {
+        public static string baseUrl = "http://notebook.test/api/";
+
+        public static string login = "login";
+
+        public static string notebookMainList = "notebookMain";
+        public static string notebookCreate = "notebookMain";
+        public static string notebookDel = "notebookMain/delete";
+
+        public static IDictionary<string, string> getParameters()
+        {
+            IDictionary<string, string> parameters = new Dictionary<string, string>
+            {
+                { "token", GlobalVar.token }
+            };
+
+            return parameters;
         }
     }
 }

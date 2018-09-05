@@ -35,6 +35,9 @@ namespace notebook
             string username = this.username.Text;
             string password = this.password.Password;
 
+            username = "q849958241@163.com";
+            password = "123456";
+
             try
             {
                 IDictionary<string, string> data = new Dictionary<string, string>();
@@ -48,7 +51,8 @@ namespace notebook
 
                 if (result.code == 1000)
                 {
-                    GlobalVar.token = result.data.ToString();
+                    GlobalVar.token = result.data.token;
+                    GlobalVar.user_id = result.data.user_id;
                     config.token = GlobalVar.token;
                     config.saveConfig();
                     this.Close();

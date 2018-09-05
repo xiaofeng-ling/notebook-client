@@ -17,11 +17,19 @@ namespace notebook
     /// <summary>
     /// input.xaml 的交互逻辑
     /// </summary>
-    public partial class input : Window
+    public partial class Input : Window
     {
-        public input()
+        public Input()
         {
             InitializeComponent();
+
+            //this.confirm.Click += ClickClose;
+            this.cancel.Click += ClickClose;
+        }
+
+        private void ClickClose(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
