@@ -34,11 +34,11 @@ namespace notebook
 
         private void SelectDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            NotebookMainList.NotebookMain notebookMain =  this.notebookMainList.SelectedItem as NotebookMainList.NotebookMain;
 
-            if (notebookMain != null)
+            if (this.notebookMainList.SelectedItem is NotebookMainList.NotebookMain notebookMain)
             {
-                MessageBox.Show(notebookMain.name);
+                GlobalVar.notebook_id = notebookMain.id;
+                this.Close();
             }
         }
 
@@ -73,7 +73,7 @@ namespace notebook
                 {
                     IDictionary<string, string> parameters = Request.getParameters();
                     parameters.Add("name", content);
-                    Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.notebookCreate, "POST", parameters));
+                    Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.notebookMainCreate, "POST", parameters));
 
                     MessageBox.Show(result.message);
 
@@ -97,7 +97,7 @@ namespace notebook
             {
                 IDictionary<string, string> parameters = Request.getParameters();
                 parameters.Add("id", notebookMain.id.ToString());
-                Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.notebookDel, "POST", parameters));
+                Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.notebookMainDel, "POST", parameters));
 
                 MessageBox.Show(result.message);
 

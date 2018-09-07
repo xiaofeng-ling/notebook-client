@@ -41,15 +41,58 @@ namespace notebook.request
         }
     }
 
+    class UpdateResult: Result
+    {
+        public class Update
+        {
+           public  int updated_at;
+        }
+
+        public new Update data;
+    }
+
+    class LoadNotebookResult: Result
+    {
+        public class Notebook
+        {
+            public int id;
+            public string content;
+        }
+
+        public new Notebook data;
+    }
+
+    class NotebookList : Result
+    {
+        public new List<Notebook> data;
+
+        public class Notebook
+        {
+            public int id;
+            public string title;
+            public int updated_at;
+
+            public override string ToString()
+            {
+                return title;
+            }
+        }
+    }
+
     class Request
     {
         public static string baseUrl = "http://notebook.test/api/";
 
-        public static string login = "login";
+        public static readonly string login = "login";
 
-        public static string notebookMainList = "notebookMain";
-        public static string notebookCreate = "notebookMain";
-        public static string notebookDel = "notebookMain/delete";
+        public static readonly string notebookMainList = "notebookMain";
+        public static readonly string notebookMainCreate = "notebookMain";
+        public static readonly string notebookMainDel = "notebookMain/delete";
+
+        public static readonly string notebookList = "notebook";
+        public static readonly string notebookCreate = "notebook";
+        public static readonly string SaveNotebook = "notebook/update";
+        public static readonly string LoadNotebookContent = "notebook/";
 
         public static IDictionary<string, string> getParameters()
         {
