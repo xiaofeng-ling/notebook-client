@@ -82,7 +82,7 @@ namespace notebook.request
     class Request
     {
         public static string baseUrl = "http://notebook.test/api/";
-
+        
         public static readonly string login = "login";
 
         public static readonly string notebookMainList = "notebookMain";
@@ -93,6 +93,8 @@ namespace notebook.request
         public static readonly string notebookCreate = "notebook";
         public static readonly string SaveNotebook = "notebook/update";
         public static readonly string LoadNotebookContent = "notebook/";
+        public static readonly string DeleteNotebook = "notebook/delete";
+        public static readonly string ModifyTitleNotebook = "notebook/modifyTitle";
 
         public static IDictionary<string, string> getParameters()
         {

@@ -46,9 +46,66 @@ namespace notebook
 
             this.add.Click += this.AddClick;
             this.save.Click += this.SaveClickAsync;
+            this.delete.Click += this.DeleteClick;
+            this.modify.Click += this.ModifyClick;
+
             this.list.SelectionChanged += ListSelectionChanged;
 
             this.text.Text = GlobalVar.token;
+        }
+
+        private void ModifyClick(object sender, RoutedEventArgs e)
+        {
+            NotebookList.Notebook notebook = GetSelectedNotebook();
+
+            Input input = new Input();
+            string content = "";
+            input.input.Text = notebook.title;
+
+            input.confirm.Click += (object _sender, RoutedEventArgs _e) =>
+            {
+                content = input.input.Text;
+
+                if (content.Length <= 0)
+                    MessageBox.Show("请输入标题");
+                else
+                {
+                    IDictionary<string, string> parameters = Request.getParameters();
+                    parameters.Add("id", notebook.id.ToString());
+                    parameters.Add("title", notebook.title);
+
+                    Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.ModifyTitleNotebook, "POST", parameters));
+
+                    if (result.code == 1000)
+                    {
+                        // 更新名字
+                        notebook.title = content;
+                        this.list.Items.Refresh();
+                        input.Close();
+                    }
+                }
+            };
+
+            input.ShowDialog();
+        }
+
+        private void DeleteClick(object sender, RoutedEventArgs e)
+        {
+            NotebookList.Notebook notebook = GetSelectedNotebook();
+
+            IDictionary<string, string> parameters = Request.getParameters();
+            parameters.Add("id", notebook.id.ToString());
+
+            Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.DeleteNotebook, "POST", parameters));
+
+            if (result.code == 1000)
+            {
+                prevSelectedItems = null;
+                this.list.Items.Remove(notebook);
+
+                // 减去1的原因是为了方便后续的分页加载，防止加载断层
+                start--;
+            }
         }
 
         private void ListSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -56,9 +113,10 @@ namespace notebook
             if (prevSelectedItems != null)
                 SaveNotebookContent(prevSelectedItems, this.text.Text, false);
 
-            NotebookList.Notebook notebook = (sender as ListBox).SelectedItem as NotebookList.Notebook;
+            NotebookList.Notebook notebook = GetSelectedNotebook();
 
-            LoadNotebookContent(notebook.id);
+            if (notebook != null)
+                 LoadNotebookContent(notebook.id);
 
             prevSelectedItems = notebook;
         }
@@ -85,14 +143,13 @@ namespace notebook
             foreach (NotebookList.Notebook noteBook in result.data)
             {
                 this.list.Items.Add(noteBook);
+                start++;
             }
-
-            MessageBox.Show(GlobalVar.notebook_id.ToString());
         }
 
         private void SaveClickAsync(object sender, RoutedEventArgs e)
         {
-            SaveNotebookContent(this.list.SelectedItem as NotebookList.Notebook, this.text.Text);
+            SaveNotebookContent(GetSelectedNotebook(), this.text.Text);
         }
 
         /// <summary>
@@ -118,19 +175,18 @@ namespace notebook
                     parameters.Add("notebook_id", GlobalVar.notebook_id.ToString());
                     Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.notebookCreate, "POST", parameters));
 
-                    MessageBox.Show(result.message);
-
                     if (result.code == 1000)
                     {
                         input.Close();
                         LoadNotebookPage();
+
+                        // 选中新增的一页
+                        this.list.SelectedIndex = this.list.Items.Count - 1;
                     }
                 }
             };
 
             input.ShowDialog();
-
-            //this.list.Items.Add();
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -174,7 +230,7 @@ namespace notebook
                 if (result.code == 1000)
                     this.list.Dispatcher.Invoke(() =>
                     {
-                        (this.list.SelectedItem as NotebookList.Notebook).updated_at = result.data.updated_at;
+                        notebook.updated_at = result.data.updated_at;
                     });
                     
             }
@@ -188,6 +244,12 @@ namespace notebook
                 tempResult = Http.Send(Request.baseUrl + Request.SaveNotebook, "POST", parameters);
                 callback(tempResult);
             }
+        }
+
+        private NotebookList.Notebook GetSelectedNotebook()
+        {
+            NotebookList.Notebook notebook = this.list.SelectedItem as NotebookList.Notebook;
+            return notebook;
         }
     }
 
