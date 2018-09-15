@@ -27,6 +27,7 @@ namespace notebook
     {
         private int start = 0;
         private int limit = 100;
+        private bool isEnd = false;
 
         private NotebookList.Notebook prevSelectedItems = null;
 
@@ -38,7 +39,7 @@ namespace notebook
             GlobalVar.token = config.token;
 
             //if ("" == GlobalVar.token)
-                new Login().ShowDialog();
+            new Login().ShowDialog();
 
             new NoteBookMain().ShowDialog();
 
@@ -49,9 +50,53 @@ namespace notebook
             this.delete.Click += this.DeleteClick;
             this.modify.Click += this.ModifyClick;
 
-            this.list.SelectionChanged += ListSelectionChanged;
+            this.list.SelectionChanged += this.ListSelectionChanged;
 
-            this.text.Text = GlobalVar.token;
+            // 在可视化树创建完成后才能够找到子节点
+            this.Loaded += (object sender, RoutedEventArgs e) =>
+            {
+                ScrollViewer scrollViewer = FindVisualFirstChild<ScrollViewer>(this.list);
+
+                if (scrollViewer != null)
+                    scrollViewer.ScrollChanged += ScrollChanged;
+            };
+
+            // 定时保存，每60秒保存一次
+            System.Timers.Timer timer = new System.Timers.Timer
+            {
+                Interval = 10 * 1000,     // 每60秒执行一次
+                Enabled = true
+            };
+            timer.Elapsed += new System.Timers.ElapsedEventHandler(AutoSave);
+        }
+
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            ScrollViewer scroll = sender as ScrollViewer;
+            if (scroll.VerticalOffset >= scroll.ScrollableHeight)
+                LoadNotebookPage();
+        }
+
+        private void HandleMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollViewer scrollViewer = VisualTreeHelper.GetChild(this.list, 1) as ScrollViewer;
+        }
+
+        public void AutoSave(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            NotebookList.Notebook notebook = GetSelectedNotebook();
+            string text = "";
+
+            this.text.Dispatcher.Invoke(() =>
+            {
+                text = this.text.Text;
+            });
+
+            if (notebook != null && text != "")
+                SaveNotebookContent(notebook, text);
+
+            // 自动保存，消息提示
+            //MessageBox.Show("保存成功");
         }
 
         private void ModifyClick(object sender, RoutedEventArgs e)
@@ -116,7 +161,7 @@ namespace notebook
             NotebookList.Notebook notebook = GetSelectedNotebook();
 
             if (notebook != null)
-                 LoadNotebookContent(notebook.id);
+                LoadNotebookContent(notebook.id);
 
             prevSelectedItems = notebook;
         }
@@ -131,7 +176,10 @@ namespace notebook
                 MessageBox.Show("请选择日记本！");
             }
 
-            IDictionary<string, string> parameters =Request.getParameters();
+            if (isEnd)
+                return;
+
+            IDictionary<string, string> parameters = Request.getParameters();
             parameters.Add("notebook_id", GlobalVar.notebook_id.ToString());
             parameters.Add("start", start.ToString());
             parameters.Add("end", (start + limit).ToString());
@@ -145,6 +193,12 @@ namespace notebook
                 this.list.Items.Add(noteBook);
                 start++;
             }
+
+            // 已经结束了
+            if (result.data.Count == 0)
+                isEnd = true;
+
+            this.list.Items.Refresh();
         }
 
         private void SaveClickAsync(object sender, RoutedEventArgs e)
@@ -217,11 +271,14 @@ namespace notebook
         {
             long updated_at = Int64.Parse(Helper.GetTimeStamp());
 
+            if (notebook is null || content == "")
+                return;
+
             IDictionary<string, string> parameters = Request.getParameters();
             parameters.Add("id", notebook.id.ToString());
             parameters.Add("title", notebook.title);
             parameters.Add("content", content);
-            parameters.Add("updated_at", (updated_at/1000).ToString());
+            parameters.Add("updated_at", (updated_at / 1000).ToString());
 
             void callback(string responseText)
             {
@@ -232,12 +289,12 @@ namespace notebook
                     {
                         notebook.updated_at = result.data.updated_at;
                     });
-                    
+
             }
 
             string tempResult = "";
             if (async)
-                #pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
+#pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
                 Http.SendAsync(Request.baseUrl + Request.SaveNotebook, "POST", parameters, callback);
             else
             {
@@ -248,8 +305,69 @@ namespace notebook
 
         private NotebookList.Notebook GetSelectedNotebook()
         {
-            NotebookList.Notebook notebook = this.list.SelectedItem as NotebookList.Notebook;
+            NotebookList.Notebook notebook = null;
+
+            this.list.Dispatcher.Invoke(() =>
+            {
+                notebook = this.list.SelectedItem as NotebookList.Notebook;
+            });
+
             return notebook;
+        }
+
+        /// <summary>
+        /// 递归查找第一个子节点
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private T FindVisualFirstChild<T>(DependencyObject obj) where T : DependencyObject
+         {
+            List<T> list = FindVisualChildList<T>(obj);
+
+            return list != null && list.Count > 0 
+                ? list[0] : null;
+         }
+
+        /// <summary>
+        /// 递归查找子节点
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private List<T> FindVisualChildList<T>(DependencyObject obj) where T : DependencyObject
+        {
+            try
+            {
+                List<T> TList = new List<T> { };
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                    if (child != null && child is T)
+                    {
+                        TList.Add((T)child);
+                        List<T> childOfChildren = FindVisualChildList<T>(child);
+                        if (childOfChildren != null)
+                        {
+                            TList.AddRange(childOfChildren);
+                        }
+                    }
+                    else
+                    {
+                        List<T> childOfChildren = FindVisualChildList<T>(child);
+                        if (childOfChildren != null)
+                        {
+                            TList.AddRange(childOfChildren);
+                        }
+                    }
+                }
+                return TList;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return null;
+            }
         }
     }
 

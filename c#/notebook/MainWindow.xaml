@@ -33,7 +33,7 @@
             <Button x:Name="modify" Height="20" VerticalAlignment="Bottom" Content="修改标题" Margin="15,0,78,4"/>
             <Button x:Name="delete" Height="20" VerticalAlignment="Bottom"  Width="40" Content="删除" Margin="89,0,21,4"/>
 
-            <ListView x:Name="list" Grid.Row="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,10,10,10" Width="120">
+            <ListView x:Name="list" Grid.Row="1" HorizontalAlignment="Center" HorizontalContentAlignment="Center" Margin="10,10,10,10" Width="120" >
             </ListView>
         </Grid>
 
