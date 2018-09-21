@@ -35,9 +35,6 @@ namespace notebook
             string username = this.username.Text;
             string password = this.password.Password;
 
-            username = "q849958241@163.com";
-            password = "123456";
-
             try
             {
                 IDictionary<string, string> data = new Dictionary<string, string>();

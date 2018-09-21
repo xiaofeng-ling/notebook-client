@@ -84,6 +84,7 @@ namespace notebook.request
         public static string baseUrl = "http://notebook.test/api/";
         
         public static readonly string login = "login";
+        public static readonly string refresh = "refresh";
 
         public static readonly string notebookMainList = "notebookMain";
         public static readonly string notebookMainCreate = "notebookMain";

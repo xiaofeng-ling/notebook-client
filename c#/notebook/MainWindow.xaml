@@ -41,7 +41,7 @@
         <Label  HorizontalAlignment="Stretch" Margin="10,0,10,10" Grid.Row="1" VerticalAlignment="Stretch" Content="1234"/>
         <Menu HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Grid.ColumnSpan="2" Margin="10,10,10,0">
             <MenuItem Margin="0,0,10,0" Header="开始&#xD;&#xA;开始" Height="18" Width="60">
-                <MenuItem Header="登录" Click="MenuItem_Click" HorizontalAlignment="Left">
+                <MenuItem Header="登录" HorizontalAlignment="Left">
 
                 </MenuItem>
             </MenuItem>

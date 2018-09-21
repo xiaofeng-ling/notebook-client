@@ -1,20 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Newtonsoft.Json;
 using notebook.request;
 
@@ -36,10 +25,8 @@ namespace notebook
             InitializeComponent();
 
             Config config = Config.LoadConfig();
-            GlobalVar.token = config.token;
 
-            //if ("" == GlobalVar.token)
-            new Login().ShowDialog();
+            CheckIsLogin(ref config);
 
             new NoteBookMain().ShowDialog();
 
@@ -70,6 +57,37 @@ namespace notebook
             timer.Elapsed += new System.Timers.ElapsedEventHandler(AutoSave);
         }
 
+        /// <summary>
+        /// 检查是否已经登录，如果没有登录，则直接进行登录
+        /// </summary>
+        private static void CheckIsLogin(ref Config config)
+        {
+            GlobalVar.token = config.token;
+            if ("" == GlobalVar.token)
+                new Login().ShowDialog();
+            else
+            {
+                // 刷新token
+                IDictionary<string, string> parameters = Request.getParameters();
+                Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.refresh, "POST", parameters));
+
+                // 解析失败或者code已失效
+                if (0 == result.code || 102 == result.code)
+                    new Login().ShowDialog();
+                else
+                {
+                    GlobalVar.token = result.data.ToString();
+                    config.token = GlobalVar.token;
+                    config.saveConfig();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 滚动加载
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             ScrollViewer scroll = sender as ScrollViewer;
@@ -77,11 +95,11 @@ namespace notebook
                 LoadNotebookPage();
         }
 
-        private void HandleMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ScrollViewer scrollViewer = VisualTreeHelper.GetChild(this.list, 1) as ScrollViewer;
-        }
-
+        /// <summary>
+        /// 自动保存
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void AutoSave(object sender, System.Timers.ElapsedEventArgs e)
         {
             NotebookList.Notebook notebook = GetSelectedNotebook();
@@ -99,6 +117,11 @@ namespace notebook
             //MessageBox.Show("保存成功");
         }
 
+        /// <summary>
+        /// 修改标题
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ModifyClick(object sender, RoutedEventArgs e)
         {
             NotebookList.Notebook notebook = GetSelectedNotebook();
@@ -134,6 +157,11 @@ namespace notebook
             input.ShowDialog();
         }
 
+        /// <summary>
+        /// 删除日记本
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteClick(object sender, RoutedEventArgs e)
         {
             NotebookList.Notebook notebook = GetSelectedNotebook();
@@ -153,6 +181,11 @@ namespace notebook
             }
         }
 
+        /// <summary>
+        /// 列表选中项改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (prevSelectedItems != null)
@@ -241,11 +274,6 @@ namespace notebook
             };
 
             input.ShowDialog();
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            new Login().Show();
         }
 
         /// <summary>
