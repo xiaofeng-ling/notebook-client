@@ -66,8 +66,12 @@ namespace notebook
             }
             catch(WebException e)
             {
-                Stream responseStream = e.Response.GetResponseStream();
-                responseText = new StreamReader(responseStream).ReadToEnd();
+                if (null != e.Response)
+                {
+                    Stream responseStream = e.Response.GetResponseStream();
+                    responseText = new StreamReader(responseStream).ReadToEnd();
+                }
+                MessageBox.Show(e.Message);
             }
             catch (Exception)
             {

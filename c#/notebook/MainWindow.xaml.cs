@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,6 +18,7 @@ namespace notebook
         private int start = 0;
         private int limit = 100;
         private bool isEnd = false;
+        private long tipsTime = Int64.Parse(Helper.GetTimeStamp());      // tips时间延迟变量
 
         private NotebookList.Notebook prevSelectedItems = null;
 
@@ -48,6 +50,31 @@ namespace notebook
                     scrollViewer.ScrollChanged += ScrollChanged;
             };
 
+            SetAutoSave();
+            SetTimeTips();
+        }
+
+        private void SetTimeTips()
+        {
+            // 显示时间，每秒变动一次
+            System.Timers.Timer timer = new System.Timers.Timer
+            {
+                Interval = 1000, 
+                Enabled = true
+            };
+            timer.Elapsed += new System.Timers.ElapsedEventHandler((object sender, ElapsedEventArgs e) =>
+            {
+                string[] weekday = { "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" };
+
+                DateTime dateTime = System.DateTime.Now;
+                string tips = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                tips += "  " + weekday[Convert.ToInt32(dateTime.DayOfWeek)];
+                SetTips(tips);
+            });
+        }
+
+        private void SetAutoSave()
+        {
             // 定时保存，每60秒保存一次
             System.Timers.Timer timer = new System.Timers.Timer
             {
@@ -72,7 +99,7 @@ namespace notebook
                 Result result = JsonConvert.DeserializeObject<Result>(Http.Send(Request.baseUrl + Request.refresh, "POST", parameters));
 
                 // 解析失败或者code已失效
-                if (0 == result.code || 102 == result.code)
+                if (0 == result.code || 102 == result.code || 101 == result.code)
                     new Login().ShowDialog();
                 else
                 {
@@ -114,7 +141,7 @@ namespace notebook
                 SaveNotebookContent(notebook, text);
 
             // 自动保存，消息提示
-            //MessageBox.Show("保存成功");
+            SetTips("保存成功", 3000);
         }
 
         /// <summary>
@@ -313,11 +340,14 @@ namespace notebook
                 UpdateResult result = JsonConvert.DeserializeObject<UpdateResult>(responseText);
 
                 if (result.code == 1000)
+                {
                     this.list.Dispatcher.Invoke(() =>
                     {
                         notebook.updated_at = result.data.updated_at;
                     });
 
+                    this.SetTips("保存成功", 3000);
+                }
             }
 
             string tempResult = "";
@@ -395,6 +425,42 @@ namespace notebook
             {
                 MessageBox.Show(e.Message);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// 设置tips内容
+        /// </summary>
+        /// <param name="tips">提示内容</param>
+        /// <param name="delay">显示多少毫秒</param>
+        private void SetTips(string tips, int delay = 0)
+        {
+            // 上一个显示延时没有结束，则不进行设置
+            long now = Int64.Parse(Helper.GetTimeStamp());
+            if (now <= this.tipsTime)
+                return;
+
+            this.tipsTime = now + delay;
+
+            this.tips.Dispatcher.Invoke(() => {
+                this.tips.Content = tips;
+            });
+        }
+
+        private void text_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.S))
+            {
+                NotebookList.Notebook notebook = GetSelectedNotebook();
+                string text = "";
+
+                this.text.Dispatcher.Invoke(() =>
+                {
+                    text = this.text.Text;
+                });
+
+                if (notebook != null && text != "")
+                    SaveNotebookContent(notebook, text);
             }
         }
     }

@@ -37,8 +37,8 @@
             </ListView>
         </Grid>
 
-        <TextBox x:Name="text" Grid.Column="0" Grid.Row="0" Background="white" Margin="10,33.5,10,10" TextWrapping="Wrap" Text="TextBlock" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="5,5,5,5"/>
-        <Label  HorizontalAlignment="Stretch" Margin="10,0,10,10" Grid.Row="1" VerticalAlignment="Stretch" Content="1234"/>
+        <TextBox x:Name="text" Grid.Column="0" Grid.Row="0" Background="white" Margin="10,33.5,10,10" AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalScrollBarVisibility ="Auto"  Padding="5,5,5,5" KeyDown="text_KeyDown" />
+        <Label  x:Name="tips" HorizontalAlignment="Stretch" Margin="10,0,10,10" Grid.Row="1" VerticalAlignment="Stretch"/>
         <Menu HorizontalAlignment="Left" Height="18" VerticalAlignment="Top" Grid.ColumnSpan="2" Margin="10,10,10,0">
             <MenuItem Margin="0,0,10,0" Header="开始&#xD;&#xA;开始" Height="18" Width="60">
                 <MenuItem Header="登录" HorizontalAlignment="Left">
