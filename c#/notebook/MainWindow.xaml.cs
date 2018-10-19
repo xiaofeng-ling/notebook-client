@@ -337,6 +337,9 @@ namespace notebook
 
             void callback(string responseText)
             {
+                if (responseText == "")
+                    return;
+
                 UpdateResult result = JsonConvert.DeserializeObject<UpdateResult>(responseText);
 
                 if (result.code == 1000)
@@ -447,8 +450,9 @@ namespace notebook
             });
         }
 
-        private void text_KeyDown(object sender, KeyEventArgs e)
+        private void Text_KeyDown(object sender, KeyEventArgs e)
         {
+            // ctrl+s
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.S))
             {
                 NotebookList.Notebook notebook = GetSelectedNotebook();

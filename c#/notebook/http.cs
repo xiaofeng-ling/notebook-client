@@ -21,6 +21,8 @@ namespace notebook
     /// </summary>
     public class Http
     {
+        // 用于同一时间只能有一个请求的标志
+        private static bool is_send;
 
         /// <summary>
         /// 发送请求
@@ -32,7 +34,6 @@ namespace notebook
         /// <returns>接收到的数据</returns>
         public static String Send(string url, string method = "GET", IDictionary<string,string> parameters = null)
         {
-
             string responseText = "";
 
             try
@@ -56,7 +57,6 @@ namespace notebook
                     using (Stream reqStream = request.GetRequestStream())
                     {
                         reqStream.Write(data, 0, data.Length);
-                        reqStream.Close();
                     }
                 }
 
