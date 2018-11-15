@@ -19,6 +19,7 @@ namespace notebook
         private int limit = 100;
         private bool isEnd = false;
         private long tipsTime = Int64.Parse(Helper.GetTimeStamp());      // tips时间延迟变量
+        private bool saveLock = false;               // 保存用锁，防止同一时间大量请求保存接口
 
         private NotebookList.Notebook prevSelectedItems = null;
 
@@ -141,7 +142,7 @@ namespace notebook
                 SaveNotebookContent(notebook, text);
 
             // 自动保存，消息提示
-            SetTips("保存成功", 3000);
+            SetTips("自动保存成功", 3000);
         }
 
         /// <summary>
@@ -275,7 +276,12 @@ namespace notebook
         {
             // 填写页的名称
             Input input = new Input();
+
             string content = "";
+
+            // 设置默认文字
+            input.input.Text = System.DateTime.Now.ToString("yyyy年MM月dd日"); 
+
             input.confirm.Click += (object _sender, RoutedEventArgs _e) =>
             {
                 content = input.input.Text;
@@ -292,15 +298,30 @@ namespace notebook
                     if (result.code == 1000)
                     {
                         input.Close();
-                        LoadNotebookPage();
+
+                        RewindLoadNotebookPage();
 
                         // 选中新增的一页
-                        this.list.SelectedIndex = this.list.Items.Count - 1;
+                        //this.list.SelectedIndex =  this.list.Items.Count - 1;
+                        this.list.SelectedIndex = 0;
                     }
                 }
             };
 
             input.ShowDialog();
+        }
+
+        /// <summary>
+        /// 重新加载首页
+        /// </summary>
+        private void RewindLoadNotebookPage()
+        {
+            // 因为是倒序排列（最新的在最前面，所以需要清空列表，同时重置加载结束的标志
+            this.list.Items.Clear();
+            isEnd = false;
+            start = 0;
+            limit = 100;
+            LoadNotebookPage();
         }
 
         /// <summary>
@@ -326,8 +347,10 @@ namespace notebook
         {
             long updated_at = Int64.Parse(Helper.GetTimeStamp());
 
-            if (notebook is null || content == "")
+            if (notebook is null || content == "" || !saveLock)
                 return;
+
+            saveLock = true;
 
             IDictionary<string, string> parameters = Request.getParameters();
             parameters.Add("id", notebook.id.ToString());
@@ -337,6 +360,8 @@ namespace notebook
 
             void callback(string responseText)
             {
+                saveLock = false;
+
                 if (responseText == "")
                     return;
 
@@ -350,6 +375,14 @@ namespace notebook
                     });
 
                     this.SetTips("保存成功", 3000);
+                }
+                else if (result.code == 1003)   // 文件有冲突
+                {
+                    this.list.Dispatcher.Invoke(() =>
+                    {
+                        isEnd = false;
+                        RewindLoadNotebookPage();
+                    });
                 }
             }
 
